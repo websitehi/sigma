@@ -1,0 +1,216 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local SigmaGui = Instance.new("ScreenGui")
+local Frame = Instance.new("ImageLabel")
+local WalkSpeedButton = Instance.new("TextBox")
+local ToolsButton = Instance.new("TextButton")
+local TpFinishButton = Instance.new("TextButton")
+local Line = Instance.new("TextLabel")
+local VrpzWareTextLabel = Instance.new("TextLabel")
+local JumpButton = Instance.new("TextBox")
+local function rizzgear()
+	-- Get the LocalPlayer
+	local player = game.Players.LocalPlayer
+
+	-- Access ReplicatedStorage and find the "Gear" folder
+	local replicatedStorage = game:GetService("ReplicatedStorage")
+	local gearFolder = replicatedStorage:FindFirstChild("Gear")
+
+	-- Ensure the folder exists
+	if gearFolder then
+		-- Iterate through each item in the Gear folder
+		for _, item in ipairs(gearFolder:GetChildren()) do
+			-- Clone each item and move it to the LocalPlayer's Backpack
+			local clone = item:Clone()
+			clone.Parent = player.Backpack
+		end
+	else
+		warn("Gear folder not found in ReplicatedStorage.")
+	end
+
+end
+local function rizz()
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+	local tower = workspace:WaitForChild("tower")
+	local finishes = tower:WaitForChild("finishes")
+
+	-- Function to scan and delete objects with "kill" in their name
+	local function scanAndDeleteKillObjects(parent)
+		for _, child in pairs(parent:GetChildren()) do
+			if string.find(child.Name:lower(), "kill") then
+				child:Destroy()
+			elseif child:IsA("Model") or child:IsA("Folder") then
+				scanAndDeleteKillObjects(child)
+			end
+		end
+	end
+
+	-- Scan workspace for "kill" objects
+	scanAndDeleteKillObjects(workspace)
+
+	-- Ensure that finishes model has a PrimaryPart set or use a specific part
+	local primaryPart = finishes.PrimaryPart or finishes:FindFirstChildWhichIsA("BasePart")
+	if primaryPart then
+		local TweenService = game:GetService("TweenService")
+
+		local targetPosition = primaryPart.Position
+		local targetCFrame = CFrame.new(targetPosition)
+
+		local tweenInfo = TweenInfo.new(
+			2, -- Duration of the tween
+			Enum.EasingStyle.Linear, -- Easing style of the tween
+			Enum.EasingDirection.Out, -- Easing direction of the tween
+			0, -- Number of times the tween should repeat
+			false, -- Should the tween reverse?
+			0 -- Delay before the tween starts
+		)
+
+		local goal = {}
+		goal.CFrame = targetCFrame
+
+		local tween = TweenService:Create(humanoidRootPart, tweenInfo, goal)
+		tween:Play()
+	else
+		warn("No primary part or base part found in the finishes model.")
+	end
+
+end
+
+--Properties:
+
+SigmaGui.Name = "SigmaGui"
+SigmaGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+SigmaGui.ResetOnSpawn = false
+
+Frame.Name = "Frame"
+Frame.Parent = SigmaGui
+Frame.Active = true
+Frame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+Frame.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Frame.Position = UDim2.new(0.0889637545, 0, 0.387096763, 0)
+Frame.Size = UDim2.new(0, 429, 0, 220)
+Frame.ImageColor3 = Color3.fromRGB(31, 31, 31)
+Frame.ScaleType = Enum.ScaleType.Slice
+Frame.SliceCenter = Rect.new(100, 100, 100, 100)
+Frame.SliceScale = 0.120
+Frame.Draggable = true
+
+WalkSpeedButton.Name = "WalkSpeedButton"
+WalkSpeedButton.Parent = Frame
+WalkSpeedButton.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+WalkSpeedButton.BorderColor3 = Color3.fromRGB(200, 116, 217)
+WalkSpeedButton.Position = UDim2.new(0.511037827, 0, 0.295950025, 0)
+WalkSpeedButton.Size = UDim2.new(0, 200, 0, 50)
+WalkSpeedButton.Font = Enum.Font.SourceSansBold
+WalkSpeedButton.PlaceholderColor3 = Color3.fromRGB(200, 116, 217)
+WalkSpeedButton.PlaceholderText = "walkspeed"
+WalkSpeedButton.Text = ""
+WalkSpeedButton.TextColor3 = Color3.fromRGB(200, 116, 217)
+WalkSpeedButton.TextSize = 14.000
+local textBox = WalkSpeedButton  -- Replace with actual path to your TextBox
+local defaultWalkSpeed = 16  -- Adjust as per your game's default walk speed
+
+local function updateWalkSpeed()
+	local desiredWalkSpeed = tonumber(textBox.Text)
+	if desiredWalkSpeed then
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = desiredWalkSpeed
+	else
+		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = defaultWalkSpeed
+	end
+end
+
+textBox:GetPropertyChangedSignal("Text"):Connect(updateWalkSpeed)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+	updateWalkSpeed()
+end)
+
+
+
+ToolsButton.Name = "ToolsButton"
+ToolsButton.Parent = Frame
+ToolsButton.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+ToolsButton.BorderColor3 = Color3.fromRGB(200, 116, 217)
+ToolsButton.Position = UDim2.new(0.0196048766, 0, 0.294867635, 0)
+ToolsButton.Size = UDim2.new(0, 200, 0, 50)
+ToolsButton.Font = Enum.Font.SourceSansBold
+ToolsButton.Text = "give all tools"
+ToolsButton.TextColor3 = Color3.fromRGB(200, 116, 217)
+ToolsButton.TextSize = 14.000
+ToolsButton.MouseButton1Click:Connect(rizzgear)
+
+TpFinishButton.Name = "TpFinishButton"
+TpFinishButton.Parent = Frame
+TpFinishButton.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+TpFinishButton.BorderColor3 = Color3.fromRGB(200, 116, 217)
+TpFinishButton.Position = UDim2.new(0.0200186782, 0, 0.635272503, 0)
+TpFinishButton.Size = UDim2.new(0, 200, 0, 50)
+TpFinishButton.Font = Enum.Font.SourceSansBold
+TpFinishButton.Text = "tp to finish - banable if used to much"
+TpFinishButton.TextColor3 = Color3.fromRGB(200, 116, 217)
+TpFinishButton.TextSize = 14.000
+TpFinishButton.MouseButton1Click:Connect(rizz)
+
+Line.Name = "Line"
+Line.Parent = Frame
+Line.Active = true
+Line.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+Line.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Line.BorderSizePixel = 0
+Line.Position = UDim2.new(0, 0, 0.175679162, 0)
+Line.Size = UDim2.new(0, 428, 0, -6)
+Line.Font = Enum.Font.SourceSans
+Line.Text = ""
+Line.TextColor3 = Color3.fromRGB(255, 87, 255)
+Line.TextSize = 18.000
+
+VrpzWareTextLabel.Name = "VrpzWareTextLabel"
+VrpzWareTextLabel.Parent = Frame
+VrpzWareTextLabel.Active = true
+VrpzWareTextLabel.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+VrpzWareTextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+VrpzWareTextLabel.BorderSizePixel = 0
+VrpzWareTextLabel.Position = UDim2.new(0.0333012938, 0, 0.0317436904, 0)
+VrpzWareTextLabel.Size = UDim2.new(0, 194, 0, 19)
+VrpzWareTextLabel.Font = Enum.Font.Unknown
+VrpzWareTextLabel.Text = "sigma  ware"
+VrpzWareTextLabel.TextColor3 = Color3.fromRGB(200, 116, 217)
+VrpzWareTextLabel.TextSize = 18.000
+VrpzWareTextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+JumpButton.Name = "JumpButton"
+JumpButton.Parent = Frame
+JumpButton.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
+JumpButton.BorderColor3 = Color3.fromRGB(200, 116, 217)
+JumpButton.Position = UDim2.new(0.511037827, 0, 0.635478616, 0)
+JumpButton.Size = UDim2.new(0, 200, 0, 50)
+JumpButton.Font = Enum.Font.SourceSansBold
+JumpButton.PlaceholderColor3 = Color3.fromRGB(200, 116, 217)
+JumpButton.PlaceholderText = "jump power"
+JumpButton.Text = ""
+JumpButton.TextColor3 = Color3.fromRGB(200, 116, 217)
+JumpButton.TextSize = 14.000
+local textBox = JumpButton  -- Replace with actual path to your TextBox
+local defaultJumpPower = 50  -- Adjust as per your game's default jump power
+
+local function updateJumpPower()
+	local desiredJumpPower = tonumber(textBox.Text)
+	if desiredJumpPower then
+		game.Players.LocalPlayer.Character.Humanoid.JumpPower = desiredJumpPower
+	else
+		game.Players.LocalPlayer.Character.Humanoid.JumpPower = defaultJumpPower
+	end
+end
+
+textBox:GetPropertyChangedSignal("Text"):Connect(updateJumpPower)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+	updateJumpPower()
+	-- Call your other functions here if needed
+end)
